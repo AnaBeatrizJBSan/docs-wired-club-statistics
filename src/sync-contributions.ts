@@ -14,7 +14,7 @@ export async function syncContributions(config: Config, github = createGitHubCli
   for (const [id, author] of authors) {
     const { data } = await github.rest.users.getByUsername({ username: author.login });
     if (String(data.id) !== id) {
-      throw new Error(`GitHub identity changed for ${author.login}; contributions were not updated.`);
+      throw new Error(`GitHub identity changed for ${author.login}; merged_prs was not updated.`);
     }
   }
 
@@ -26,7 +26,7 @@ export async function syncContributions(config: Config, github = createGitHubCli
     for (const holder of result.items) {
       if (!holder.user) throw new Error("Habbo returned a github_id holder without a user.");
       if (holders.has(holder.user.id)) {
-        throw new Error("Habbo returned duplicate holders; contributions were not updated.");
+        throw new Error("Habbo returned duplicate holders; merged_prs was not updated.");
       }
       holders.set(holder.user.id, holder.variable.value);
     }
@@ -34,20 +34,20 @@ export async function syncContributions(config: Config, github = createGitHubCli
   }
 
   const matched = new Set<string>();
-  const updated: { habboId: number; githubId: string; contributions: number }[] = [];
+  const updated: { habboId: number; githubId: string; mergedPrs: number }[] = [];
   for (const [habboId, githubId] of holders) {
     if (githubId <= 0n) continue;
     const author = authors.get(githubId.toString());
     // Set zero for linked users with no authored PRs to clear stale counts.
     const count = author?.count ?? 0;
     try {
-      const result = await users.giveVariable("contributions", UserTargetKind.Users, habboId, BigInt(count));
-      if (result.value !== BigInt(count)) throw new Error("Unexpected contribution value.");
-    } catch {
-      throw new Error(`Could not confirm contributions for Habbo user ${habboId}. ${updated.length} earlier user updates succeeded; rerunning will assign the totals again.`);
+      const result = await users.giveVariable("merged_prs", UserTargetKind.Users, habboId, BigInt(count));
+      if (result.value !== BigInt(count)) throw new Error("Unexpected merged_prs value.");
+    } catch(error) {
+      throw new Error(`Could not confirm merged_prs for Habbo user ${habboId}. ${updated.length} earlier user updates succeeded; rerunning will assign the totals again: ${error}`);
     }
     if (author) matched.add(githubId.toString());
-    updated.push({ habboId, githubId: githubId.toString(), contributions: count });
+    updated.push({ habboId, githubId: githubId.toString(), mergedPrs: count });
   }
   const skipped = [...authors].filter(([id]) => !matched.has(id)).map(([, author]) => author.login);
   return { updated, skipped };

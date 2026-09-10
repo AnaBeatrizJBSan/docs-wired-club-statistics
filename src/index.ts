@@ -1,6 +1,7 @@
 import { createGitHubClient } from "./github.js";
 import { readConfig, syncOpenedPrs } from "./sync-opened-prs.js";
 import { syncContributions } from "./sync-contributions.js";
+import { syncCommits } from "./sync-commits.js";
 import { syncStars } from "./sync-stars.js";
 import { syncRevisions } from "./sync-revisions.js";
 import { syncGitHubUsernames } from "./sync-github-usernames.js";
@@ -18,10 +19,17 @@ try {
   console.log(`Updated Habbo stars_qtd to ${stars} (WiredClub/docs).`);
   const contributions = await syncContributions(config, github);
   for (const user of contributions.updated) {
-    console.log(`Updated Habbo user ${user.habboId}: contributions=${user.contributions} (GitHub ID ${user.githubId}).`);
+    console.log(`Updated Habbo user ${user.habboId}: merged_prs=${user.mergedPrs} (GitHub ID ${user.githubId}).`);
   }
   for (const login of contributions.skipped) {
     console.log(`Skipped ${login}: no matching Habbo github_id.`);
+  }
+  const commits = await syncCommits(config, github);
+  for (const user of commits.updated) {
+    console.log(`Updated Habbo user ${user.habboId}: commits=${user.commits} (GitHub ID ${user.githubId}).`);
+  }
+  for (const login of commits.skipped) {
+    console.log(`Skipped commit author ${login}: no matching Habbo github_id.`);
   }
   const revisions = await syncRevisions(config, github);
   for (const user of revisions.updated) {
