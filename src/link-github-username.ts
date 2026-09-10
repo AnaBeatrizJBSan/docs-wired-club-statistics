@@ -35,7 +35,7 @@ export async function linkGitHubUsername(
       && currentParts.every((value, i) => value === parts[i]);
   }
   async function setStatus(value: bigint) {
-    const result = await users.giveVariable("linked_gh", UserTargetKind.Users, habboUserId, value);
+    const result = await users.changeVariable("linked_gh", UserTargetKind.Users, habboUserId, value);
     if (result.value !== value) throw new Error("Habbo did not confirm linked_gh status.");
   }
   async function rejectInput(reason: string) {
