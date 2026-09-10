@@ -1,4 +1,5 @@
 node_modules/
+.pm2/
 dist/
 coverage/
 *.tsbuildinfo
