@@ -1,0 +1,28 @@
+{
+  "name": "docs-wired-club-habbo-room",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": "24.x",
+    "yarn": "1.22.22"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node --env-file-if-exists=.env --enable-source-maps dist/index.js",
+    "sync": "node --env-file-if-exists=.env --import tsx src/index.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "octokit": "^5.0.5",
+    "wired-api-wrapper-node": "^1.0.4"
+  }
+}
