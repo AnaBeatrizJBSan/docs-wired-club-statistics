@@ -9,6 +9,7 @@
     "yarn": "1.22.22"
   },
   "scripts": {
+    "watch:links": "node --env-file-if-exists=.env --import tsx src/watch-github-links.ts",
     "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",

@@ -1,6 +1,8 @@
 import { Octokit } from "octokit";
 
-export class GitHubRateLimitError extends Error {}
+export class GitHubRateLimitError extends Error {
+  constructor(message: string, public readonly retryAt = 0) { super(message); }
+}
 
 export function createGitHubClient(token?: string, fetcher?: typeof fetch) {
   const github = new Octokit({
@@ -29,7 +31,7 @@ export function createGitHubClient(token?: string, fetcher?: typeof fetch) {
     const wait = retryAt > 0 && !Number.isNaN(date.getTime())
       ? ` Retry after ${date.toISOString()}.`
       : " Wait at least one minute before retrying; increase the wait if it persists.";
-    throw new GitHubRateLimitError(`GitHub API rate limit reached.${wait} No automatic retry was scheduled.${token ? " Your authenticated quota is exhausted." : " Set GITHUB_TOKEN in .env to use an authenticated quota."}`);
+    throw new GitHubRateLimitError(`GitHub API rate limit reached.${wait} No automatic retry was scheduled.${token ? " Your authenticated quota is exhausted." : " Set GITHUB_TOKEN in .env to use an authenticated quota."}`, retryAt);
   });
   return github;
 }
