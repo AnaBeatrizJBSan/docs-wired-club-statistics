@@ -1139,10 +1139,10 @@ universal-user-agent@^7.0.0, universal-user-agent@^7.0.2:
   resolved "https://registry.npmjs.org/universal-user-agent/-/universal-user-agent-7.0.3.tgz"
   integrity sha512-TmnEAEAsBJVZM/AADELsK76llnwcf9vMKuPz8JflO1frO8Lchitr0fNaN9d+Ap0BjKtqWqd/J17qeDnXh8CL2A==
 
-wired-api-wrapper-node@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/wired-api-wrapper-node/-/wired-api-wrapper-node-1.0.4.tgz"
-  integrity sha512-UFaqVfjGX7hRmnUOdDk7v2lbXRM0VDGWL7cO2I448JaxiY5s+YizMI56jV8omId2OfFoCVEqCjvE9b/outEkSQ==
+wired-api-wrapper-node@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/wired-api-wrapper-node/-/wired-api-wrapper-node-1.0.6.tgz#d1f244932aa4df93cdf18af716d3596d8b8bafcd"
+  integrity sha512-SrAS1SOTHHgv/U8iUx8KM63WPQGzj+LNc08dkEJV4PpTqoZ6fiPGaNhZ+wTqppj0n+Ts+umia+Mluwxk9YPuVA==
   dependencies:
     json-with-bigint "^3.5.12"
 
