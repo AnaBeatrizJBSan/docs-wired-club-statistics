@@ -94,10 +94,19 @@ export class DashboardManager {
   }
 
   async action(action: string) {
-    if (!["sync", "watcher-start", "watcher-stop", "watcher-restart"].includes(action)) throw new Error("Unknown action.");
+    if (!["sync", "watcher-start", "watcher-stop", "watcher-restart", "clear-sync-logs", "clear-watcher-logs"].includes(action)) throw new Error("Unknown action.");
     if (this.busy) throw new Error("Another action is in progress. Try again shortly.");
     this.busy = true;
     try {
+      if (action === "clear-sync-logs") {
+        this.sync.logs = "";
+        return;
+      }
+      if (action === "clear-watcher-logs") {
+        await this.watcherRequest;
+        await this.runPM2(["flush", "wired-club-links"]);
+        return;
+      }
       const watcher = await this.watcher(true);
       if (action === "sync") {
         if (this.child) throw new Error("A sync is already running.");

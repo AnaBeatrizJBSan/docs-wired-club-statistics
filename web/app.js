@@ -41,6 +41,7 @@ function renderLogs() {
     if ($("autoscroll").checked) $("logs").scrollTop = $("logs").scrollHeight;
   }
   $("copy").disabled = !content;
+  $("clear").disabled = !content || acting || state.busy || !connected;
   $("log-caption").textContent = tab === "sync" ? "Latest run · session only" : "Recent PM2 output · stdout + stderr";
 }
 async function refresh() {
@@ -59,7 +60,7 @@ async function refresh() {
     $("connection").textContent = "○  Connection unavailable";
     $("notice").hidden = false;
     $("notice").textContent = error.message;
-    actionIds.forEach(id => { $(id).disabled = true; });
+    [...actionIds, "clear"].forEach(id => { $(id).disabled = true; });
   }
 }
 for (const id of actionIds) $(id).addEventListener("click", async () => {
@@ -83,6 +84,20 @@ $("copy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("logs").textContent); $("copy").textContent = "Copied"; }
   catch { $("copy").textContent = "Select log to copy"; }
   setTimeout(() => { $("copy").textContent = "Copy log"; }, 1800);
+});
+$("clear").addEventListener("click", async () => {
+  const selected = tab;
+  acting = true;
+  actionError = "";
+  render();
+  try {
+    const response = await fetch(`/api/actions/clear-${selected}-logs`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not clear logs.");
+  } catch (error) { actionError = error.message; }
+  finally { acting = false; await refresh(); }
 });
 async function poll() { await refresh(); setTimeout(poll, 3000); }
 poll();

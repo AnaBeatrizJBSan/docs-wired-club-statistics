@@ -6,6 +6,7 @@ export async function syncContributions(config: Config, github = createGitHubCli
   const authors = new Map<string, { login: string; count: number }>();
   // Finish all GitHub reads before changing any contribution values.
   for (const pr of await getPullRequests(github)) {
+    if (!pr.merged_at) continue; // Closed PRs are not necessarily merged.
     if (!pr.user) continue; // Deleted accounts cannot be resolved by username.
     const author = authors.get(String(pr.user.id)) ?? { login: pr.user.login, count: 0 };
     author.count++;
@@ -38,7 +39,7 @@ export async function syncContributions(config: Config, github = createGitHubCli
   for (const [habboId, githubId] of holders) {
     if (githubId <= 0n) continue;
     const author = authors.get(githubId.toString());
-    // Set zero for linked users with no authored PRs to clear stale counts.
+    // Set zero for linked users with no merged authored PRs to clear stale counts.
     const count = author?.count ?? 0;
     try {
       const result = await users.giveVariable("merged_prs", UserTargetKind.Users, habboId, BigInt(count));
