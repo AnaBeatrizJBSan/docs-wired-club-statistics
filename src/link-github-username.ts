@@ -63,11 +63,27 @@ export async function linkGitHubUsername(
   });
   if (!data) return rejectInput(`GitHub account "${username}" not found (HTTP 404)`);
   if (!Number.isSafeInteger(data.id) || data.id <= 0) throw new Error("GitHub returned an invalid user ID; github_id was not changed.");
+  // Read every page: an existing link may belong to an offline room member.
+  // Do not cache these holders between requests, since earlier requests can add links.
+  const id = BigInt(data.id);
+  const seen = new Set<number>();
+  for (let page = 1; ; page++) {
+    const holders = await users.listHolders("github_id", UserTargetKind.Users, undefined, undefined, page, 50);
+    for (const holder of holders.items) {
+      if (!holder.user || seen.has(holder.user.id)) {
+        throw new Error("Could not validate existing GitHub links; github_id was not changed.");
+      }
+      seen.add(holder.user.id);
+      if (holder.variable.value === id && holder.user.id !== habboUserId) {
+        return rejectInput(`GitHub account "${data.login}" is already linked to Habbo user ${holder.user.id}`);
+      }
+    }
+    if (holders.items.length < 50) break;
+  }
   if (!await stillPending()) {
     log(`Habbo user ${habboUserId}: input changed during lookup; update skipped.`);
     return null;
   }
-  const id = BigInt(data.id);
   log(`Habbo user ${habboUserId}: saving github_id=${id}.`);
   const updated = await users.giveVariable("github_id", UserTargetKind.Users, habboUserId, id);
   if (updated.value !== id) throw new Error("Habbo did not confirm the expected github_id.");
