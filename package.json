@@ -21,7 +21,8 @@
     "build": "tsc",
     "start": "node --env-file-if-exists=.env --enable-source-maps dist/index.js",
     "sync": "node --env-file-if-exists=.env --import tsx src/index.ts",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "dashboard": "node --env-file-if-exists=.env --import tsx src/dashboard.ts"
   },
   "devDependencies": {
     "@types/node": "^26.5.0",
